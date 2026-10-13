@@ -8,6 +8,19 @@ App móvil de estadísticas de Fórmula 1 hecha con Flutter. Consume la API púb
 
 ---
 
+## Organización del repositorio
+
+```
+App-Flutter/
+  app/          # el proyecto Flutter completo (código, android, ios, pubspec.yaml...)
+  documentos/   # documentación del proyecto (.docx y .md)
+  README.md     # este archivo
+```
+
+Los comandos de `flutter` se ejecutan **dentro de la carpeta `app/`**.
+
+---
+
 ## Requisitos
 
 Todo lo siguiente debe estar instalado antes de ejecutar la app (el equivalente a un
@@ -63,7 +76,7 @@ Dependencias de Dart (se instalan solas con `flutter pub get`): `dio`.
 ### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/leoUDD/App-Flutter.git
-cd App-Flutter
+cd App-Flutter/app
 ```
 
 ### 2. Instalar las dependencias
@@ -86,7 +99,7 @@ adb devices
 Debe aparecer `emulator-5554   device`.
 
 ### 4. Ejecutar la app
-Con el emulador abierto, desde la carpeta del proyecto:
+Con el emulador abierto, desde la carpeta `app/`:
 ```bash
 flutter run
 ```
@@ -101,7 +114,7 @@ Con la app corriendo en la terminal:
 | `q` | Cierra la app |
 
 ### Ejecutar desde Android Studio (alternativa)
-1. *File > Open* y elige la carpeta del proyecto.
+1. *File > Open* y elige la carpeta `app/` (no la raíz del repositorio).
 2. Selecciona el emulador en la barra superior.
 3. Pulsa el botón verde ▶ **Run**.
 
@@ -118,20 +131,22 @@ flutter doctor -v   # diagnóstico detallado del entorno
 
 ---
 
-## Estructura del proyecto
+## Estructura de la app (`app/`)
 
 ```
-lib/
-  main.dart                       # punto de entrada
-  models/                         # clases que representan los datos de la API
-    driver_standing.dart
-    race.dart
-  services/
-    jolpica_service.dart          # llamadas a la API (con caché de 5 minutos)
-  screens/
-    standings_screen.dart         # campeonato de pilotos
-test/
-  widget_test.dart                # pruebas de los modelos
+app/
+  lib/
+    main.dart                     # punto de entrada
+    models/                       # clases que representan los datos de la API
+      driver_standing.dart
+      race.dart
+    services/
+      jolpica_service.dart        # llamadas a la API (con caché de 5 minutos)
+    screens/
+      standings_screen.dart       # campeonato de pilotos
+  test/
+    widget_test.dart              # pruebas de los modelos
+  pubspec.yaml                    # dependencias del proyecto
 ```
 
 ## API utilizada
