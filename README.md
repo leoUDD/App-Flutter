@@ -16,6 +16,10 @@ App-Flutter/
 
 Los comandos de `flutter` se ejecutan **dentro de la carpeta `app/`**.
 
+El proyecto incluye solo las plataformas móviles (`android/` e `ios/`). Si algún día necesitas
+otra plataforma, se genera con `flutter create --platforms=web,windows .` dentro de `app/`.
+Para compilar la versión de iOS hace falta un Mac con Xcode.
+
 ---
 
 ## Requisitos
@@ -143,6 +147,8 @@ app/
       standings_screen.dart       # campeonato de pilotos
   test/
     widget_test.dart              # pruebas de los modelos
+  android/                        # proyecto nativo de Android
+  ios/                            # proyecto nativo de iOS
   pubspec.yaml                    # dependencias del proyecto
 ```
 
@@ -159,8 +165,8 @@ Ambas APIs limitan la cantidad de peticiones, por eso el servicio guarda las res
 
 | Problema | Solución |
 |---|---|
-| `Unable to find suitable Visual Studio toolchain` | Elegiste Windows como dispositivo. Abre el emulador y ejecuta `flutter run -d emulator-5554`. |
-| `flutter run` solo ofrece Windows, Chrome y Edge | El emulador aún no terminó de cargar o no está abierto. Espera y revisa `adb devices`. |
+| `flutter run` solo ofrece Windows, Chrome y Edge | Son dispositivos del equipo, no móviles. El emulador aún no terminó de cargar o no está abierto: espera y revisa `adb devices`. |
+| `Cannot access 'android.app.Activity'` al compilar | Un proceso de Gradle viejo quedó con rutas antiguas. Ejecuta `cd android && gradlew --stop`, vuelve a `app/` y repite `flutter run`. |
 | `emulator` no se reconoce como comando | Agrega la carpeta `emulator` del SDK al `Path` y abre una terminal nueva. |
 | `Cannot find AVD system path` / `Broken AVD system path` | Define `ANDROID_SDK_ROOT` y `ANDROID_HOME` con la ruta de tu SDK y abre una terminal nueva. |
 | `Android license status unknown` | Ejecuta `flutter doctor --android-licenses` y acepta todo con `y`. |
