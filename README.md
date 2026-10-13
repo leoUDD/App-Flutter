@@ -3,9 +3,6 @@
 App móvil de estadísticas de Fórmula 1 hecha con Flutter. Consume la API pública
 [Jolpica (formato Ergast)](https://api.jolpi.ca/ergast/f1) para mostrar datos de la temporada.
 
-**Funciona hoy:** campeonato de pilotos de la temporada actual.
-**En desarrollo:** calendario, resultados por carrera y telemetría con [OpenF1](https://openf1.org).
-
 ---
 
 ## Organización del repositorio
