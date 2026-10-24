@@ -15,10 +15,13 @@ class StandingsScreen extends StatefulWidget {
 
 class _StandingsScreenState extends State<StandingsScreen> {
   late final JolpicaService _service = widget.service ?? JolpicaService();
-  late Future<List<DriverStanding>> _future = _service.getDriverStandings();
+  int _season = DateTime.now().year;
+  late Future<List<DriverStanding>> _future = _service.getDriverStandings(season: '$_season');
 
   void _reload() {
-    setState(() => _future = _service.getDriverStandings());
+    setState(() {
+      _future = _service.getDriverStandings(season: '$_season');
+    });
   }
 
   String _errorMessage(Object error) {
@@ -31,7 +34,26 @@ class _StandingsScreenState extends State<StandingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Campeonato de pilotos')),
+      appBar: AppBar(title: const Text('Campeonato de pilotos'),
+          actions: [
+            DropdownButton<int>(
+              value: _season,
+              underline: const SizedBox(),
+              items: [
+                for (var year = DateTime.now().year; year >= 1950; year--)
+                  DropdownMenuItem(value: year, child: Text('$year')),
+              ],
+              onChanged: (year) {
+                if (year == null) return;
+                setState(() {
+                  _season = year;
+                  _future = _service.getDriverStandings(season: '$_season');
+                });
+              },
+            ),
+            const SizedBox(width: 16),
+          ]),
+
       body: FutureBuilder<List<DriverStanding>>(
         future: _future,
         builder: (context, snapshot) {
@@ -63,7 +85,7 @@ class _StandingsScreenState extends State<StandingsScreen> {
               itemBuilder: (context, i) {
                 final s = standings[i];
                 return ListTile(
-                  leading: CircleAvatar(child: Text('${s.position}')),
+                  leading: CircleAvatar(child: Text(s.position?.toString() ?? '-')),
                   title: Text(s.fullName),
                   subtitle: Text('${s.teamName} · ${s.wins} victorias'),
                   trailing: Text(

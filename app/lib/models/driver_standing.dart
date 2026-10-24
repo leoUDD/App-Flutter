@@ -1,5 +1,6 @@
 class DriverStanding {
-  final int position;
+  // Es null cuando el piloto no puntuó en temporadas antiguas (la API lo marca con "-").
+  final int? position;
   final double points;
   final int wins;
   final String driverId;
@@ -32,7 +33,7 @@ class DriverStanding {
         ? (constructors.last as Map<String, dynamic>)['name'] as String
         : '-';
     return DriverStanding(
-      position: int.parse(json['position'] as String),
+      position: int.tryParse((json['positionText'] as String?) ?? ''),
       points: double.parse(json['points'] as String),
       wins: int.parse(json['wins'] as String),
       driverId: driver['driverId'] as String,
