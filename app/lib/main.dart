@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/season_provider.dart';
-import 'screens/standings_screen.dart';
+import 'screens/home_shell.dart';
 
 void main() {
   runApp(
@@ -23,7 +23,7 @@ class F1StatsApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
         useMaterial3: true,
       ),
-      home: const StandingsScreen(),
+      home: const HomeShell(),
     );
   }
 }
