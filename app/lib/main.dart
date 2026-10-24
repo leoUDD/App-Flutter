@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import 'providers/season_provider.dart';
 import 'screens/standings_screen.dart';
 
 void main() {
-  runApp(const F1StatsApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => SeasonProvider(),
+      child: const F1StatsApp(),
+    ),
+  );
 }
 
 class F1StatsApp extends StatelessWidget {

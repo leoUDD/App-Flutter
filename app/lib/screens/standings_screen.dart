@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
+import '../providers/season_provider.dart';
 import '../models/driver_standing.dart';
 import '../services/jolpica_service.dart';
 
@@ -15,12 +16,12 @@ class StandingsScreen extends StatefulWidget {
 
 class _StandingsScreenState extends State<StandingsScreen> {
   late final JolpicaService _service = widget.service ?? JolpicaService();
-  int _season = DateTime.now().year;
-  late Future<List<DriverStanding>> _future = _service.getDriverStandings(season: '$_season');
+  int _loadedSeason = DateTime.now().year;
+  late Future<List<DriverStanding>> _future = _service.getDriverStandings(season: '$_loadedSeason');
 
   void _reload() {
     setState(() {
-      _future = _service.getDriverStandings(season: '$_season');
+      _future = _service.getDriverStandings(season: '$_loadedSeason');
     });
   }
 
@@ -33,11 +34,16 @@ class _StandingsScreenState extends State<StandingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final season = context.watch<SeasonProvider>().season;
+    if (season != _loadedSeason) {
+      _loadedSeason = season;
+      _future = _service.getDriverStandings(season: '$season');
+    }
     return Scaffold(
       appBar: AppBar(title: const Text('Campeonato de pilotos'),
           actions: [
             DropdownButton<int>(
-              value: _season,
+              value: season,
               underline: const SizedBox(),
               items: [
                 for (var year = DateTime.now().year; year >= 1950; year--)
@@ -45,10 +51,7 @@ class _StandingsScreenState extends State<StandingsScreen> {
               ],
               onChanged: (year) {
                 if (year == null) return;
-                setState(() {
-                  _season = year;
-                  _future = _service.getDriverStandings(season: '$_season');
-                });
+                context.read<SeasonProvider>().setseason(year);
               },
             ),
             const SizedBox(width: 16),
