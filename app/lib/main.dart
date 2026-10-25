@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'screens/standings_screen.dart';
+import 'theme/app_theme.dart';
+import 'providers/season_provider.dart';
+import 'screens/home_shell.dart';
 
 void main() {
-  runApp(const F1StatsApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => SeasonProvider(),
+      child: const F1StatsApp(),
+    ),
+  );
 }
 
 class F1StatsApp extends StatelessWidget {
@@ -13,11 +21,8 @@ class F1StatsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'F1 Stats',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),
-      home: const StandingsScreen(),
+      theme: buildAppTheme(),
+      home: const HomeShell(),
     );
   }
 }
