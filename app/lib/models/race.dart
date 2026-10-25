@@ -1,5 +1,6 @@
 class Race {
   final int round;
+  final int season;
   final String name;
   final String circuitName;
   final String locality;
@@ -9,6 +10,7 @@ class Race {
 
   const Race({
     required this.round,
+    required this.season,
     required this.name,
     required this.circuitName,
     required this.locality,
@@ -24,6 +26,7 @@ class Race {
     final timeStr = json['time'] as String?;
     return Race(
       round: int.parse(json['round'] as String),
+      season: int.parse(json['season'] as String),
       name: json['raceName'] as String,
       circuitName: circuit['circuitName'] as String,
       locality: location['locality'] as String,

@@ -54,6 +54,7 @@ void main() {
   test('Race.fromJson lee fecha y circuito', () {
     final r = Race.fromJson({
       'round': '1',
+      'season': '2026',
       'raceName': 'Australian Grand Prix',
       'date': '2026-03-08',
       'time': '04:00:00Z',
@@ -63,6 +64,7 @@ void main() {
       },
     });
     expect(r.round, 1);
+    expect(r.season, 2026);
     expect(r.date, DateTime.utc(2026, 3, 8, 4));
     expect(r.country, 'Australia');
   });

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'race_result_screen.dart';
 import '../providers/season_provider.dart';
 import '../models/race.dart';
 import '../services/jolpica_service.dart';
@@ -88,6 +89,14 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     '${race.circuitName}\n${race.locality}, ${race.country}',
                   ),
                   isThreeLine: true,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => RaceResultScreen(race: race),
+                      ),
+                    );
+                  },
                   trailing: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.end,

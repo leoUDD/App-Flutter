@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../models/race_result.dart';
 import '../models/driver_standing.dart';
 import '../models/race.dart';
 
@@ -61,5 +62,22 @@ class JolpicaService {
     final data = await _get('/$season.json', query: {'limit': 100});
     final races = data['RaceTable']['Races'] as List;
     return races.map((e) => Race.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  /// Resultados de una carrera.
+  Future<List<RaceResult>> getRaceResults({
+    required int season,
+    required int round,
+  }) async {
+    final data = await _get(
+      '/$season/$round/results.json',
+      query: {'limit': 100},
+    );
+    final races = data['RaceTable']['Races'] as List;
+    if (races.isEmpty) return [];
+    final results = races.first['Results'] as List;
+    return results
+        .map((e) => RaceResult.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 }
