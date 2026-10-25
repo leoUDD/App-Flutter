@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'theme/app_theme.dart';
 import 'providers/season_provider.dart';
 import 'screens/home_shell.dart';
 
@@ -20,10 +21,7 @@ class F1StatsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'F1 Stats',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.red),
-        useMaterial3: true,
-      ),
+      theme: buildAppTheme(),
       home: const HomeShell(),
     );
   }

@@ -1,12 +1,14 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'race_result_screen.dart';
+import '../models/calendar_entry.dart';
 import '../providers/season_provider.dart';
-import '../models/race.dart';
 import '../services/jolpica_service.dart';
-import '../widgets/season_dropdown.dart';
+import '../theme/app_theme.dart';
+import '../widgets/race_card.dart';
+import '../widgets/skeleton.dart';
+import '../widgets/state_views.dart';
+import 'race_result_screen.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, this.service});
@@ -20,19 +22,14 @@ class CalendarScreen extends StatefulWidget {
 class _CalendarScreenState extends State<CalendarScreen> {
   late final JolpicaService _service = widget.service ?? JolpicaService();
   int _loadedSeason = DateTime.now().year;
-  late Future<List<Race>> _future = _service.getRaces(season: '$_loadedSeason');
+  late Future<List<CalendarEntry>> _future = _service.getCalendar(
+    season: _loadedSeason,
+  );
 
   void _reload() {
     setState(() {
-      _future = _service.getRaces(season: '$_loadedSeason');
+      _future = _service.getCalendar(season: _loadedSeason);
     });
-  }
-
-  String _errorMessage(Object error) {
-    if (error is DioException) {
-      return 'No se pudo conectar con la API (${error.type.name}).';
-    }
-    return 'Ocurrió un error inesperado.';
   }
 
   @override
@@ -40,77 +37,68 @@ class _CalendarScreenState extends State<CalendarScreen> {
     final season = context.watch<SeasonProvider>().season;
     if (season != _loadedSeason) {
       _loadedSeason = season;
-      _future = _service.getRaces(season: '$season');
+      _future = _service.getCalendar(season: season);
     }
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Calendario de carreras'),
-        actions: [const SeasonDropdown(), const SizedBox(width: 16)],
-      ),
-
-      body: FutureBuilder<List<Race>>(
+      body: FutureBuilder<List<CalendarEntry>>(
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
+            return const CardsSkeleton(
+              title: 'Calendario',
+              subtitle: 'Cargando carreras…',
+            );
           }
           if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(_errorMessage(snapshot.error!)),
-                  const SizedBox(height: 12),
-                  FilledButton(
-                    onPressed: _reload,
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
+            return ErrorView(
+              title: 'Calendario',
+              what: 'el calendario',
+              error: snapshot.error!,
+              onRetry: _reload,
             );
           }
-          final races = snapshot.data!;
-          if (races.isEmpty) {
-            return const Center(
-              child: Text('Sin carreras para esta temporada'),
+          final entries = snapshot.data!;
+          if (entries.isEmpty) {
+            final previous = DateTime.now().year - 1;
+            return EmptyView(
+              title: 'Calendario',
+              icon: Icons.event_busy_outlined,
+              heading: 'No hay carreras para esta temporada',
+              message: 'Todavía no hay un calendario publicado. Prueba con otra temporada.',
+              actionLabel: 'Ver temporada $previous',
+              onAction: () =>
+                  context.read<SeasonProvider>().setSeason(previous),
             );
           }
+          final played = entries.where((e) => e.played).length;
           return RefreshIndicator(
             onRefresh: () async => _reload(),
-            child: ListView.separated(
-              itemCount: races.length,
-              separatorBuilder: (_, _) => const Divider(height: 1),
-              itemBuilder: (context, i) {
-                final race = races[i];
-                return ListTile(
-                  leading: CircleAvatar(child: Text('${race.round}')),
-                  title: Text(race.name),
-                  subtitle: Text(
-                    '${race.circuitName}\n${race.locality}, ${race.country}',
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: [
+                Text(
+                  'Calendario',
+                  style: Theme.of(context).textTheme.headlineLarge,
+                ),
+                const SizedBox(height: 16),
+                _ProgressCard(played: played, total: entries.length),
+                const SizedBox(height: 16),
+                for (final entry in entries) ...[
+                  RaceCard(
+                    entry: entry,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RaceResultScreen(race: entry.race),
+                        ),
+                      );
+                    },
                   ),
-                  isThreeLine: true,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => RaceResultScreen(race: race),
-                      ),
-                    );
-                  },
-                  trailing: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        _formatDate(race.date),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      if (race.hasTime && race.date != null)
-                        Text(_formatTime(race.date!)),
-                    ],
-                  ),
-                );
-              },
+                  const SizedBox(height: 8),
+                ],
+              ],
             ),
           );
         },
@@ -119,31 +107,69 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 }
 
-const _months = [
-  'Ene',
-  'Feb',
-  'Mar',
-  'Abr',
-  'May',
-  'Jun',
-  'Jul',
-  'Ago',
-  'Sep',
-  'Oct',
-  'Nov',
-  'Dic',
-];
+class _ProgressCard extends StatelessWidget {
+  const _ProgressCard({required this.played, required this.total});
 
-String _formatDate(DateTime? date) {
-  if (date == null) return '-';
-  final d = date.toLocal();
-  return '${d.day} ${_months[d.month - 1]}';
-}
+  final int played;
+  final int total;
 
-String _formatTime(DateTime? date) {
-  if (date == null) return '-';
-  final d = date.toLocal();
-  final hh = d.hour.toString().padLeft(2, '0');
-  final mm = d.minute.toString().padLeft(2, '0');
-  return '$hh:$mm';
+  @override
+  Widget build(BuildContext context) {
+    final fraction = total == 0 ? 0.0 : played / total;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.avatar),
+      ),
+      child: Column(
+        spacing: 10,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: '$played',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.text,
+                      ),
+                    ),
+                    TextSpan(text: ' de $total carreras disputadas'),
+                  ],
+                ),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                ),
+              ),
+              Text(
+                '${(fraction * 100).round()}%',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                ),
+              ),
+            ],
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: fraction,
+              minHeight: 6,
+              backgroundColor: AppColors.border,
+              color: AppColors.accent,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

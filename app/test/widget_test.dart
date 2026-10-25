@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:app_flutter/models/calendar_entry.dart';
 import 'package:app_flutter/models/driver_standing.dart';
 import 'package:app_flutter/models/race.dart';
+import 'package:app_flutter/models/race_result.dart';
 
 void main() {
   test('DriverStanding.fromJson convierte textos a números', () {
@@ -18,13 +20,47 @@ void main() {
         'nationality': 'Italian',
       },
       'Constructors': [
-        {'name': 'Mercedes'},
+        {'constructorId': 'mercedes', 'name': 'Mercedes'},
       ],
     });
     expect(s.position, 1);
     expect(s.points, 340);
     expect(s.fullName, 'Andrea Kimi Antonelli');
     expect(s.teamName, 'Mercedes');
+    expect(s.teamId, 'mercedes');
+    expect(s.initials, 'AA');
+    expect(s.pointsLabel, '340');
+  });
+
+  test('RaceResult.fromJson lee un piloto que abandonó (sin tiempo)', () {
+    final r = RaceResult.fromJson({
+      'positionText': 'R',
+      'points': '0',
+      'grid': '11',
+      'laps': '0',
+      'status': 'Retired',
+      'Driver': {
+        'givenName': 'Nico',
+        'familyName': 'Hülkenberg',
+        'code': 'HUL',
+      },
+      'Constructor': {'constructorId': 'audi', 'name': 'Audi'},
+    });
+    expect(r.positionText, 'R');
+    expect(r.time, isNull);
+    expect(r.status, 'Retired');
+    expect(r.teamId, 'audi');
+    expect(r.initials, 'NH');
+    expect(r.pointsLabel, '0');
+  });
+
+  test('RaceWinner.fromJson abrevia el nombre y guarda la escudería', () {
+    final w = RaceWinner.fromJson({
+      'Driver': {'givenName': 'Charles', 'familyName': 'Leclerc'},
+      'Constructor': {'constructorId': 'ferrari', 'name': 'Ferrari'},
+    });
+    expect(w.name, 'C. Leclerc');
+    expect(w.teamId, 'ferrari');
   });
 
   test(
@@ -42,12 +78,14 @@ void main() {
           'nationality': 'Swiss',
         },
         'Constructors': [
-          {'name': 'Maserati'},
+          {'constructorId': 'maserati', 'name': 'Maserati'},
         ],
       });
       expect(s.position, isNull);
       expect(s.fullName, 'Toulo de Graffenried');
       expect(s.code, '');
+      expect(s.teamId, 'maserati');
+      expect(s.initials, 'TD');
     },
   );
 

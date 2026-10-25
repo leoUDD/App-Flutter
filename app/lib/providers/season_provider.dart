@@ -5,7 +5,7 @@ class SeasonProvider extends ChangeNotifier {
 
   int get season => _season;
 
-  void setseason(int year) {
+  void setSeason(int year) {
     if (year == _season) return;
     _season = year;
     notifyListeners();
