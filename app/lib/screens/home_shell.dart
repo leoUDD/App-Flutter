@@ -4,6 +4,7 @@ import '../widgets/app_logo.dart';
 import '../widgets/season_dropdown.dart';
 import 'standings_screen.dart';
 import 'calendar_screen.dart';
+import 'comparison_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -28,7 +29,7 @@ class _HomeShellState extends State<HomeShell> {
         index: _index,
         children: const [
           StandingsScreen(),
-          Center(child: Text('Comparador (próximamente)')),
+          ComparisonScreen(),
           CalendarScreen(),
         ],
       ),
