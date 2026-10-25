@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/season_provider.dart';
+import '../screens/driver_detail_screen.dart';
 import '../models/driver_standing.dart';
 import '../theme/app_theme.dart';
 import 'driver_avatar.dart';
@@ -48,86 +51,101 @@ class PodiumCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = standing;
-    return Container(
-      constraints: BoxConstraints(minHeight: _minHeight),
-      alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-      decoration: BoxDecoration(
-        color: _isChampion ? AppColors.championSurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: _medalColor, width: 1.5),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        spacing: 6,
-        children: [
-          if (_isChampion)
+    final season = context.watch<SeasonProvider>().season;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute<void>(
+            builder: (_) => DriverDetailScreen(standing: s, season: season),
+          ),
+        );
+      },
+      child: Container(
+        constraints: BoxConstraints(minHeight: _minHeight),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+        decoration: BoxDecoration(
+          color: _isChampion ? AppColors.championSurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: _medalColor, width: 1.5),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 6,
+          children: [
+            if (_isChampion)
+              Text(
+                seasonFinished ? 'CAMPEÓN' : 'LÍDER',
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.2,
+                  color: AppColors.gold,
+                ),
+              ),
             Text(
-              seasonFinished ? 'CAMPEÓN' : 'LÍDER',
-              style: const TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.2,
-                color: AppColors.gold,
+              '$place',
+              style: TextStyle(
+                fontSize: _isChampion ? 28 : 22,
+                fontWeight: FontWeight.w800,
+                color: _medalColor,
+                height: 1,
               ),
             ),
-          Text(
-            '$place',
-            style: TextStyle(
-              fontSize: _isChampion ? 28 : 22,
-              fontWeight: FontWeight.w800,
-              color: _medalColor,
-              height: 1,
+            Hero(
+              tag: 'driver-${s.driverId}-$season',
+              child: DriverAvatar(
+                initials: s.initials,
+                size: _avatarSize,
+                fontSize: _avatarFont,
+                ringColor: teamColor(s.teamId),
+              ),
             ),
-          ),
-          DriverAvatar(
-            initials: s.initials,
-            size: _avatarSize,
-            fontSize: _avatarFont,
-            ringColor: teamColor(s.teamId),
-          ),
-          Text(
-            s.familyName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: _isChampion ? 15 : 14,
-              fontWeight: _isChampion ? FontWeight.w700 : FontWeight.w600,
-              height: 1.1,
+            Text(
+              s.familyName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: _isChampion ? 15 : 14,
+                fontWeight: _isChampion ? FontWeight.w700 : FontWeight.w600,
+                height: 1.1,
+              ),
             ),
-          ),
-          Text(
-            s.teamName,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textMuted,
-              height: 1,
+            Text(
+              s.teamName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textMuted,
+                height: 1,
+              ),
             ),
-          ),
-          Text.rich(
-            TextSpan(
-              children: [
-                TextSpan(
-                  text: s.pointsLabel,
-                  style: TextStyle(
-                    fontSize: _isChampion ? 24 : 20,
-                    fontWeight: FontWeight.w800,
+            Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: s.pointsLabel,
+                    style: TextStyle(
+                      fontSize: _isChampion ? 24 : 20,
+                      fontWeight: FontWeight.w800,
+                    ),
                   ),
-                ),
-                const TextSpan(
-                  text: ' PTS',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textMuted,
+                  const TextSpan(
+                    text: ' PTS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textMuted,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
