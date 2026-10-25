@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import 'standings_screen.dart';
+import 'calendar_screen.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -16,10 +18,7 @@ class _HomeShellState extends State<HomeShell> {
     return Scaffold(
       body: IndexedStack(
         index: _index,
-        children: const [
-          StandingsScreen(),
-          Center(child: Text('Calendario')),
-        ],
+        children: const [StandingsScreen(), CalendarScreen()],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
@@ -29,8 +28,14 @@ class _HomeShellState extends State<HomeShell> {
           });
         },
         destinations: const [
-          NavigationDestination(icon: Icon(Icons.emoji_events), label: 'Ranking'),
-          NavigationDestination(icon: Icon(Icons.calendar_month), label: 'Calendario'),
+          NavigationDestination(
+            icon: Icon(Icons.emoji_events),
+            label: 'Ranking',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month),
+            label: 'Calendario',
+          ),
         ],
       ),
     );

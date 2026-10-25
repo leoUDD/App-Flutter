@@ -5,6 +5,7 @@ class Race {
   final String locality;
   final String country;
   final DateTime? date;
+  final bool hasTime;
 
   const Race({
     required this.round,
@@ -13,6 +14,7 @@ class Race {
     required this.locality,
     required this.country,
     required this.date,
+    required this.hasTime,
   });
 
   factory Race.fromJson(Map<String, dynamic> json) {
@@ -28,7 +30,10 @@ class Race {
       country: location['country'] as String,
       date: dateStr == null
           ? null
-          : DateTime.tryParse(timeStr == null ? dateStr : '${dateStr}T$timeStr'),
+          : DateTime.tryParse(
+              timeStr == null ? dateStr : '${dateStr}T$timeStr',
+            ),
+      hasTime: timeStr != null,
     );
   }
 }

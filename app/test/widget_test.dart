@@ -18,7 +18,7 @@ void main() {
         'nationality': 'Italian',
       },
       'Constructors': [
-        {'name': 'Mercedes'}
+        {'name': 'Mercedes'},
       ],
     });
     expect(s.position, 1);
@@ -27,26 +27,29 @@ void main() {
     expect(s.teamName, 'Mercedes');
   });
 
-  test('DriverStanding.fromJson acepta pilotos sin posición (temporadas antiguas)', () {
-    // Caso real de la temporada 1950: la API omite "position" y manda positionText "-".
-    final s = DriverStanding.fromJson({
-      'positionText': '-',
-      'points': '0',
-      'wins': '0',
-      'Driver': {
-        'driverId': 'graffenried',
-        'givenName': 'Toulo',
-        'familyName': 'de Graffenried',
-        'nationality': 'Swiss',
-      },
-      'Constructors': [
-        {'name': 'Maserati'}
-      ],
-    });
-    expect(s.position, isNull);
-    expect(s.fullName, 'Toulo de Graffenried');
-    expect(s.code, '');
-  });
+  test(
+    'DriverStanding.fromJson acepta pilotos sin posición (temporadas antiguas)',
+    () {
+      // Caso real de la temporada 1950: la API omite "position" y manda positionText "-".
+      final s = DriverStanding.fromJson({
+        'positionText': '-',
+        'points': '0',
+        'wins': '0',
+        'Driver': {
+          'driverId': 'graffenried',
+          'givenName': 'Toulo',
+          'familyName': 'de Graffenried',
+          'nationality': 'Swiss',
+        },
+        'Constructors': [
+          {'name': 'Maserati'},
+        ],
+      });
+      expect(s.position, isNull);
+      expect(s.fullName, 'Toulo de Graffenried');
+      expect(s.code, '');
+    },
+  );
 
   test('Race.fromJson lee fecha y circuito', () {
     final r = Race.fromJson({
