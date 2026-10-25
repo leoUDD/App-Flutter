@@ -14,10 +14,14 @@ class ComparisonScreen extends StatefulWidget {
   const ComparisonScreen({
     super.key,
     this.initialDriverId,
+    this.initialDriverBId,
+    this.initialSeason,
     this.showBackButton = false,
   });
 
   final String? initialDriverId;
+  final String? initialDriverBId;
+  final int? initialSeason;
   final bool showBackButton;
 
   @override
@@ -40,7 +44,7 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
     _loadedSeason = season;
     _driverA = widget.initialDriverId;
-    _driverB = null;
+    _driverB = widget.initialDriverBId;
 
     _driversFuture = _jolpica.getDriverStandings(season: '$season');
   }
@@ -63,7 +67,8 @@ class _ComparisonScreenState extends State<ComparisonScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final season = context.watch<SeasonProvider>().season;
+    final season =
+        widget.initialSeason ?? context.watch<SeasonProvider>().season;
     _prepareSeason(season);
 
     return Scaffold(
